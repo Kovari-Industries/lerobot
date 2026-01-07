@@ -1,14 +1,15 @@
 import sagemaker
 from sagemaker.estimator import Estimator
-import boto3
+import argparse
+import sys
 
 def launch_training_job():
+    parser = argparse.ArgumentParser(description="Launch LeRobot Training on SageMaker")
+    parser.add_argument("--config", type=str, default="configs/v126.yaml", help="Path to config file (relative to repo root)")
+    args = parser.parse_args()
+
     print("Initializing SageMaker Session...")
-    # Explicitly set the region to match your ECR and S3 infrastructure
-    region = "us-west-2"
-    session = sagemaker.Session(boto_session=boto3.Session(region_name=region))
-    
-    # Hardcoded role since we are launching from a local machine
+    session = sagemaker.Session()
     role = "arn:aws:iam::815254799754:role/dev-sagemaker-jobs"
     print(f"Using Role: {role}")
     
@@ -16,32 +17,36 @@ def launch_training_job():
     image_uri = "815254799754.dkr.ecr.us-west-2.amazonaws.com/dev-lerobot-training:latest"
     
     # Instance configuration
-    # ml.g5.2xlarge = 1x NVIDIA A10G (24GB VRAM)
     instance_type = "ml.g5.2xlarge"
     instance_count = 1
     
     print(f"Creating Estimator for image: {image_uri}")
+    # We pass the config path as a hyperparameter. 
+    # Our entrypoint script will read this and start training with it.
+    hyperparameters = {
+        "config_path": args.config,
+        "output_dir": "/opt/ml/model"
+    }
+    
     estimator = Estimator(
         image_uri=image_uri,
         role=role,
         instance_count=instance_count,
         instance_type=instance_type,
-        max_run=86400 * 5, 
+        max_run=86400 * 5, # 5 days max
         output_path=f"s3://{session.default_bucket()}/lerobot-training",
-        sagemaker_session=session
+        sagemaker_session=session,
+        hyperparameters=hyperparameters
     )
     
-    print(f"Launching training job on {instance_type}...")
-    # inputs={} is used if you aren't using SageMaker's native data channels
-    # (e.g. if your container pulls data directly from Hugging Face or S3 internally)
+    print(f"Launching training job on {instance_type} with config: {args.config}")
     estimator.fit(
         inputs=None, 
         wait=False,
         job_name=f"lerobot-coffee-{sagemaker.utils.unique_name_from_base('train')}"
     )
     
-    print(f"Job launched successfully!")
-    print(f"View progress in Console: https://{region}.console.aws.amazon.com/sagemaker/home?region={region}#/jobs")
+    print(f"Job launched successfully! Training outputs will be synced to s3://{session.default_bucket()}/lerobot-training/[job-name]/output/model.tar.gz")
 
 if __name__ == "__main__":
     launch_training_job()

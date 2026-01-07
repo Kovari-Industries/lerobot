@@ -51,8 +51,6 @@ policy:
   n_obs_steps: 2
   horizon: 16
   n_action_steps: 8
-  input_shapes: null
-  output_shapes: null
   normalization_mapping:
     VISUAL: MEAN_STD
     STATE: MIN_MAX
@@ -61,8 +59,8 @@ policy:
   vision_backbone: resnet18
   crop_shape: [200, 200]
   crop_is_random: true
-  pretrained_backbone_weights: ResNet18_Weights.IMAGENET1K_V1  # ← CHANGED
-  use_group_norm: false  # ← CHANGED (must be false with pretrained weights)
+  pretrained_backbone_weights: null
+  use_group_norm: true
   spatial_softmax_num_keypoints: 32
   use_separate_rgb_encoder_per_camera: false
   down_dims: [512, 1024, 2048]
@@ -122,12 +120,12 @@ wandb:
   run_id: null
   mode: online
 
-output_dir: ./v125
+output_dir: ./v127
 job_name: null
 resume: false
 seed: 1000
 num_workers: 4
-batch_size: 64  # ← CHANGED from 8
+batch_size: 64
 eval_freq: 20000
 log_freq: 200
 tolerance_s: 0.0001

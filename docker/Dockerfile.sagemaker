@@ -49,9 +49,9 @@ RUN uv pip install --no-cache ".[all]" sagemaker-training
 COPY --chown=user_lerobot:user_lerobot . .
 
 # 8. Entrypoint
-# We set the entrypoint to the training script directly.
-# This allows SageMaker to run the container and immediately start training.
-ENTRYPOINT ["python", "src/lerobot/scripts/lerobot_train.py"]
+COPY --chown=user_lerobot:user_lerobot docker/sagemaker_entrypoint.sh /lerobot/sagemaker_entrypoint.sh
+RUN chmod +x /lerobot/sagemaker_entrypoint.sh
 
-# Default arguments (can be overridden if needed, but difficult in standard Estimator without Toolkit)
-CMD ["--config_path", "configs/v125.yaml", "--output_dir", "/opt/ml/model"]
+# Use the wrapper script to handle SageMaker's "train" argument
+ENTRYPOINT ["/lerobot/sagemaker_entrypoint.sh"]
+
