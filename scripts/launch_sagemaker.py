@@ -2,6 +2,7 @@ import sagemaker
 from sagemaker.estimator import Estimator
 import argparse
 import sys
+import os
 
 def launch_training_job():
     parser = argparse.ArgumentParser(description="Launch LeRobot Training on SageMaker")
@@ -36,7 +37,11 @@ def launch_training_job():
         max_run=86400 * 5, # 5 days max
         output_path=f"s3://{session.default_bucket()}/lerobot-training",
         sagemaker_session=session,
-        hyperparameters=hyperparameters
+        hyperparameters=hyperparameters,
+        environment={
+            "WANDB_API_KEY": os.environ.get("WANDB_API_KEY", ""),
+            "WANDB_PROJECT": "lerobot",
+        }
     )
     
     print(f"Launching training job on {instance_type} with config: {args.config}")
