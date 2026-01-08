@@ -15,6 +15,11 @@ fi
 # If no arguments provided, check for SageMaker hyperparameters.json
 HP_FILE="/opt/ml/input/config/hyperparameters.json"
 
+# Ensure /opt/ml/model is writable by the current user
+if [ -d "/opt/ml/model" ]; then
+    sudo chown -R user_lerobot:user_lerobot /opt/ml/model
+fi
+
 if [ -f "$HP_FILE" ]; then
     echo "Reading configuration from $HP_FILE..."
     
