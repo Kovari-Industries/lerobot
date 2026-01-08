@@ -1,6 +1,6 @@
 steps: 300000
 dataset:
-  repo_id: dageorge1111/v122_coffee_pod_sade_train
+  repo_id: dageorge1111/v133_coffee_pod_train
   root: null
   episodes: null
   revision: null
@@ -56,11 +56,11 @@ policy:
     STATE: MIN_MAX
     ACTION: MIN_MAX
   drop_n_last_frames: 7
-  vision_backbone: resnet18
+  vision_backbone: resnet34
   crop_shape: [200, 200]
   crop_is_random: true
-  pretrained_backbone_weights: ResNet18_Weights.IMAGENET1K_V1  # ← CHANGED
-  use_group_norm: false  # ← CHANGED (must be false with pretrained weights)
+  pretrained_backbone_weights: ResNet34_Weights.IMAGENET1K_V1
+  use_group_norm: false
   spatial_softmax_num_keypoints: 32
   use_separate_rgb_encoder_per_camera: false
   down_dims: [512, 1024, 2048]
@@ -120,8 +120,8 @@ wandb:
   run_id: null
   mode: online
 
-output_dir: ./v128
-job_name: v128
+output_dir: ./v129
+job_name: v129
 resume: false
 seed: 1000
 num_workers: 4
