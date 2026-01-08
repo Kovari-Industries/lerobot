@@ -22,6 +22,12 @@ outputs
 rl
 media
 
+# Large local experiments and virtual environments
+v*/
+venv/
+src/outputs/
+**/*~
+
 
 # Logging
 logs

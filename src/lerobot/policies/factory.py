@@ -306,8 +306,8 @@ def make_pre_post_processors(
             dataset_stats=kwargs.get("dataset_stats"),
         )
 
-        rgb_swap_step = BGRtoRGBStep()
-        pre_processor.steps = list(pre_processor.steps) + [rgb_swap_step]
+        # rgb_swap_step = BGRtoRGBStep()
+        # pre_processor.steps = list(pre_processor.steps) + [rgb_swap_step]
 
         return pre_processor, post_processor
 
