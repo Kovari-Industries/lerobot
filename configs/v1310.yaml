@@ -1,4 +1,4 @@
-steps: 300000
+steps: 60000
 dataset:
   repo_id: dageorge1111/v133_coffee_pod_train
   image_transforms:
@@ -42,15 +42,15 @@ policy:
     VISUAL: MEAN_STD
     STATE: MEAN_STD
     ACTION: MEAN_STD
-  vision_backbone: resnet34
-  pretrained_backbone_weights: ResNet34_Weights.IMAGENET1K_V1
+  vision_backbone: resnet18
+  pretrained_backbone_weights: ResNet18_Weights.IMAGENET1K_V1
   replace_final_stride_with_dilation: false
-  pre_norm: false
+  pre_norm: true
   dim_model: 512
   n_heads: 8
   dim_feedforward: 3200
   feedforward_activation: relu
-  n_encoder_layers: 4
+  n_encoder_layers: 6
   n_decoder_layers: 1
   use_vae: true
   latent_dim: 32
@@ -88,13 +88,13 @@ wandb:
   run_id: null
   mode: online
 
-output_dir: ./v131
-job_name: v131
+output_dir: ./v135
+job_name: v135
 resume: false
 seed: 1000
 num_workers: 4
 batch_size: 8
-eval_freq: 20000
+eval_freq: 10000
 log_freq: 200
 save_checkpoint: true
-save_freq: 20000
+save_freq: 10000
