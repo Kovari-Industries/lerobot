@@ -1,0 +1,128 @@
+{
+    "codebase_version": "v3.0",
+    "robot_type": null,
+    "total_episodes": 117,
+    "total_frames": 30321,
+    "total_tasks": 1,
+    "chunks_size": 1000,
+    "fps": 30,
+    "splits": {
+        "train": "0:117"
+    },
+    "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+    "video_path": "videos/{video_key}/chunk-{chunk_index:03d}/file-{file_index:03d}.mp4",
+    "features": {
+        "observation.state": {
+            "dtype": "float32",
+            "shape": [
+                8
+            ],
+            "names": [
+                "x",
+                "y",
+                "z",
+                "qx",
+                "qy",
+                "qz",
+                "qw",
+                "gripper_width"
+            ],
+            "fps": 30
+        },
+        "observation.images.gripper": {
+            "dtype": "image",
+            "shape": [
+                360,
+                640,
+                3
+            ],
+            "names": [
+                "height",
+                "width",
+                "channel"
+            ],
+            "fps": 30
+        },
+        "observation.images.base": {
+            "dtype": "image",
+            "shape": [
+                360,
+                640,
+                3
+            ],
+            "names": [
+                "height",
+                "width",
+                "channel"
+            ],
+            "fps": 30
+        },
+        "action": {
+            "dtype": "float32",
+            "shape": [
+                8
+            ],
+            "names": [
+                "x",
+                "y",
+                "z",
+                "qx",
+                "qy",
+                "qz",
+                "qw",
+                "gripper_width"
+            ],
+            "fps": 30
+        },
+        "robot_timestamp": {
+            "dtype": "float32",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "timestamp": {
+            "dtype": "float32",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "frame_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "episode_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        },
+        "task_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null,
+            "fps": 30
+        }
+    },
+    "data_files_size_in_mb": 100,
+    "video_files_size_in_mb": 200
+}

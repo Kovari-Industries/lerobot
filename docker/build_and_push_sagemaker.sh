@@ -26,7 +26,7 @@ else
     exit 1
 fi
 
-docker build -f ${DOCKERFILE} -t ${REPO_NAME} ${CONTEXT}
+docker build --no-cache -f ${DOCKERFILE} -t ${REPO_NAME} ${CONTEXT}
 
 echo "Tagging image..."
 docker tag ${REPO_NAME} ${FULL_IMAGE_NAME}

@@ -18,7 +18,7 @@ def launch_training_job():
     image_uri = "815254799754.dkr.ecr.us-west-2.amazonaws.com/dev-lerobot-training:latest"
     
     # Instance configuration
-    instance_type = "ml.g5.2xlarge"
+    instance_type = "ml.g5.4xlarge"
     instance_count = 1
     
     print(f"Creating Estimator for image: {image_uri}")

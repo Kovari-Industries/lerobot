@@ -1,0 +1,12 @@
+{"episode_index": 12, "tasks": ["unspecified_task"], "length": 139, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/1a194c41-39a1-49a2-bf50-ee70ad9f1491/", "src_episode_index": 0}}
+{"episode_index": 13, "tasks": ["unspecified_task"], "length": 352, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/1a8fe5f9-b2ce-4074-8f32-f7dd70579e0f/", "src_episode_index": 0}}
+{"episode_index": 14, "tasks": ["unspecified_task"], "length": 160, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/1c6ea3e0-6fc6-4027-85d0-c0855dd43667/", "src_episode_index": 0}}
+{"episode_index": 15, "tasks": ["unspecified_task"], "length": 269, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/201b0bf9-8bcb-4fe4-804a-e435005d627c/", "src_episode_index": 0}}
+{"episode_index": 16, "tasks": ["unspecified_task"], "length": 324, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/22f6f67b-f4b5-42c6-93a3-33001271e39d/", "src_episode_index": 0}}
+{"episode_index": 17, "tasks": ["unspecified_task"], "length": 426, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/242d99e7-9c07-418b-852c-c0043d252e22/", "src_episode_index": 0}}
+{"episode_index": 18, "tasks": ["unspecified_task"], "length": 235, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/24ff81cd-ebb5-4ade-8835-712c5dd8634a/", "src_episode_index": 0}}
+{"episode_index": 19, "tasks": ["unspecified_task"], "length": 134, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/2c043113-a107-4af9-8b8c-90db20f14603/", "src_episode_index": 0}}
+{"episode_index": 20, "tasks": ["unspecified_task"], "length": 311, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/2c626a75-a2ab-41eb-a5d4-2aa1c19cdc6f/", "src_episode_index": 0}}
+{"episode_index": 21, "tasks": ["unspecified_task"], "length": 186, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/2cd209b7-cd0a-4222-88ef-79d2ca5d1a02/", "src_episode_index": 0}}
+{"episode_index": 22, "tasks": ["unspecified_task"], "length": 230, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/2ddd4787-5ee9-4cf9-9623-3422669c34f9/", "src_episode_index": 0}}
+{"episode_index": 23, "tasks": ["unspecified_task"], "length": 327, "source": {"run_prefix": "datasets/embodiment=evo-v2/state=converted/2f6ea268-3db4-49e6-8d45-de5cb0b23f18/", "src_episode_index": 0}}
