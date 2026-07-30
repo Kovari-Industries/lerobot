@@ -79,6 +79,7 @@ from lerobot.datasets.utils import (
     write_stats,
     write_tasks,
 )
+from lerobot.datasets.v30.data_file_layout import plan_data_file_layout
 from lerobot.datasets.video_utils import concatenate_video_files, get_video_duration_in_s
 from lerobot.utils.constants import HF_LEROBOT_HOME
 from lerobot.utils.utils import init_logging
@@ -200,48 +201,48 @@ def convert_data(root: Path, new_root: Path, data_file_size_in_mb: int):
     ep_paths = sorted(data_dir.glob("*/*.parquet"))
 
     image_keys = get_image_keys(root)
-
-    ep_idx = 0
-    chunk_idx = 0
-    file_idx = 0
-    size_in_mb = 0
+    episode_sizes_mb = [get_parquet_file_size_in_mb(path) for path in ep_paths]
+    assignments = plan_data_file_layout(
+        episode_sizes_mb,
+        max_file_size_mb=data_file_size_in_mb,
+        files_per_chunk=DEFAULT_CHUNK_SIZE,
+    )
     num_frames = 0
-    paths_to_cat = []
     episodes_metadata = []
+    file_groups: list[tuple[int, int, list[Path]]] = []
 
     logging.info(f"Converting data files from {len(ep_paths)} episodes")
 
-    for ep_path in tqdm.tqdm(ep_paths, desc="convert data files"):
-        ep_size_in_mb = get_parquet_file_size_in_mb(ep_path)
+    for ep_idx, (ep_path, assignment) in enumerate(
+        tqdm.tqdm(
+            zip(ep_paths, assignments, strict=True),
+            total=len(ep_paths),
+            desc="convert data files",
+        )
+    ):
         ep_num_frames = get_parquet_num_frames(ep_path)
         ep_metadata = {
             "episode_index": ep_idx,
-            "data/chunk_index": chunk_idx,
-            "data/file_index": file_idx,
+            "data/chunk_index": assignment.chunk_index,
+            "data/file_index": assignment.file_index,
             "dataset_from_index": num_frames,
             "dataset_to_index": num_frames + ep_num_frames,
         }
-        size_in_mb += ep_size_in_mb
         num_frames += ep_num_frames
         episodes_metadata.append(ep_metadata)
-        ep_idx += 1
+        assignment_key = (assignment.chunk_index, assignment.file_index)
+        if not file_groups or file_groups[-1][:2] != assignment_key:
+            file_groups.append((*assignment_key, []))
+        file_groups[-1][2].append(ep_path)
 
-        if size_in_mb < data_file_size_in_mb:
-            paths_to_cat.append(ep_path)
-            continue
-
-        if paths_to_cat:
-            concat_data_files(paths_to_cat, new_root, chunk_idx, file_idx, image_keys)
-
-        # Reset for the next file
-        size_in_mb = ep_size_in_mb
-        paths_to_cat = [ep_path]
-
-        chunk_idx, file_idx = update_chunk_file_indices(chunk_idx, file_idx, DEFAULT_CHUNK_SIZE)
-
-    # Write remaining data if any
-    if paths_to_cat:
-        concat_data_files(paths_to_cat, new_root, chunk_idx, file_idx, image_keys)
+    for chunk_index, file_index, paths in file_groups:
+        concat_data_files(
+            paths,
+            new_root,
+            chunk_index,
+            file_index,
+            image_keys,
+        )
 
     return episodes_metadata
 
