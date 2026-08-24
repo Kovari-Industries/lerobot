@@ -377,6 +377,34 @@ class ACT(nn.Module):
             if p.dim() > 1:
                 nn.init.xavier_uniform_(p)
 
+    @staticmethod
+    def _extract_shared_camera_features(
+        images: list[Tensor], backbone: nn.Module
+    ) -> list[Tensor]:
+        """Run a shared camera backbone once when its inputs can be batched.
+
+        Camera order and per-camera request batches are restored in the returned
+        list. Policies with unlike camera shapes retain the original serial
+        behavior because concatenating those tensors would change their image
+        contract.
+        """
+        if not images:
+            return []
+        first = images[0]
+        can_batch = all(
+            image.ndim == first.ndim
+            and image.shape[1:] == first.shape[1:]
+            and image.dtype == first.dtype
+            and image.device == first.device
+            for image in images
+        )
+        if not can_batch:
+            return [backbone(image)["feature_map"] for image in images]
+
+        batch_sizes = [image.shape[0] for image in images]
+        features = backbone(torch.cat(images, dim=0))["feature_map"]
+        return list(torch.split(features, batch_sizes, dim=0))
+
     def forward(self, batch: dict[str, Tensor]) -> tuple[Tensor, tuple[Tensor, Tensor] | tuple[None, None]]:
         """A forward pass through the Action Chunking Transformer (with optional VAE encoder).
 
@@ -459,7 +487,6 @@ class ACT(nn.Module):
 
         # Prepare transformer encoder inputs.
         encoder_in_tokens = [self.encoder_latent_input_proj(latent_sample)]
-        encoder_in_pos_embed = list(self.encoder_1d_feature_pos_embed.weight.unsqueeze(1))
         # Robot state token.
         if self.config.robot_state_feature:
             encoder_in_tokens.append(self.encoder_robot_state_input_proj(batch[OBS_STATE]))
@@ -471,8 +498,12 @@ class ACT(nn.Module):
             # For a list of images, the H and W may vary but H*W is constant.
             # NOTE: If modifying this section, verify on MPS devices that
             # gradients remain stable (no explosions or NaNs).
-            for img in batch[OBS_IMAGES]:
-                cam_features = self.backbone(img)["feature_map"]
+            camera_tokens = []
+            camera_pos_embeds = []
+            camera_features = self._extract_shared_camera_features(
+                batch[OBS_IMAGES], self.backbone
+            )
+            for cam_features in camera_features:
                 cam_pos_embed = self.encoder_cam_feat_pos_embed(cam_features).to(dtype=cam_features.dtype)
                 cam_features = self.encoder_img_feat_input_proj(cam_features)
 
@@ -480,14 +511,18 @@ class ACT(nn.Module):
                 cam_features = einops.rearrange(cam_features, "b c h w -> (h w) b c")
                 cam_pos_embed = einops.rearrange(cam_pos_embed, "b c h w -> (h w) b c")
 
-                # Extend immediately instead of accumulating and concatenating
-                # Convert to list to extend properly
-                encoder_in_tokens.extend(list(cam_features))
-                encoder_in_pos_embed.extend(list(cam_pos_embed))
+                camera_tokens.append(cam_features)
+                camera_pos_embeds.append(cam_pos_embed)
 
-        # Stack all tokens along the sequence dimension.
+        # Stack scalar tokens and concatenate image sequences without creating
+        # one tracked Python object per spatial token.
         encoder_in_tokens = torch.stack(encoder_in_tokens, axis=0)
-        encoder_in_pos_embed = torch.stack(encoder_in_pos_embed, axis=0)
+        encoder_in_pos_embed = self.encoder_1d_feature_pos_embed.weight.unsqueeze(1)
+        if self.config.image_features:
+            encoder_in_tokens = torch.cat([encoder_in_tokens, *camera_tokens], dim=0)
+            encoder_in_pos_embed = torch.cat(
+                [encoder_in_pos_embed, *camera_pos_embeds], dim=0
+            )
 
         # Forward pass through the transformer modules.
         encoder_out = self.encoder(encoder_in_tokens, pos_embed=encoder_in_pos_embed)
